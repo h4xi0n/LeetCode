@@ -1,10 +1,4 @@
-import discord
 import json
-import os
-
-client = None
-def set_client_for_acc_val_calc(discord_client):
-  client = discord_client
 
 def retrieve_data():
   data = open('skindata.json','r').read().lower()
@@ -34,12 +28,18 @@ def get_list_of_items(message):
     lines_split = message.lower().split('\n')
   else:
     lines_split = message.lower()
+  battlepass_count = []
+  extra_vp = 0
   for item in lines_split:
-    if item.endswith('bundle'):
+    if item.endswith('battlepass') or item.endswith('bp'):
+      battlepass_count = [int(s) for s in item.split() if s.isdigit()]
+    elif item.endswith('vp'):
+      extra_vp = [int(s) for s in item.split() if s.isdigit()][0]
+    elif item.endswith('bundle'):
       item_list1 = item.split(' ')
       for bundle_item in item_list1:
         bundle_list.append(bundle_item)
-    elif item.endswith('melee'):
+    elif item.endswith('melee') or item.endswith('knife') or item.endswith('sword') or item.endswith('dagger') or item.endswith('axe'):
       item_list2 = item.split(' ')
       for melee_item in item_list2:
         melee_list.append(melee_item)
@@ -53,10 +53,14 @@ def get_list_of_items(message):
   item_list_melee = common_member(melee_list,melee_key_list)
   item_list_skins = common_member(skin_list,skins_key_list)
   item_list_bundle = common_member(bundle_list,bundle_key_list)
-  return item_list_melee,item_list_skins,item_list_bundle
+  if not battlepass_count:
+    count = 0
+  else:
+    count = battlepass_count[0]
+  return extra_vp,item_list_melee,item_list_skins,item_list_bundle,count 
 
 def calculate_total_vp(message):
-  melee_set,skin_set,bundle_set = get_list_of_items(message)
+  extra_vp,melee_set,skin_set,bundle_set,bp_count = get_list_of_items(message.replace('.',''))
   melee_data = get_melees()
   skin_data = get_skins()
   bundle_data = get_bundle()
@@ -85,8 +89,8 @@ def calculate_total_vp(message):
       except:
         pass
   print(bundle_vp)
-
-  return melee_vp + skin_vp + bundle_vp
+  bp_total = bp_count * 1000
+  return extra_vp,melee_vp, skin_vp, bundle_vp, bp_total
 
 
 def jsonarray_to_list(json_array):

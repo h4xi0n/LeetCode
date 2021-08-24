@@ -5,14 +5,6 @@ import annoy_people
 import social_embed
 import account_value_calculator
 
-welcome_message = 'Hello!, \nWelcome to LEET Store, Hope you enjoy your stay. Raise a ticket to request our services.\n\nType: ```!leet boost [Current Rank] [Target Rank]``` to calculate boosting (only available in tickets)\n\nType: ```!leet instagram``` to get our instagram link.\n\nType: ```!leet tell me about [@mention]``` for complimenting a user.'
-
-channel_welcome_help = '```Hello, \nWelcome to LEET Store, We are happy to help you\nFor our best in class boosting services please type !leet boost <current rank> <target rank>\nEG: !leet boost P1 D1\nUse abbrevations like G1 for Gold 1 and P1 for Platinum 1. (IM for Immortal && RA for Radiant)```'
-
-result_prefix = '@here\n\n```Breakdown: \n\n'
-result_suffix = '\n\nFollow us on Instagram: @theleetstore(https://www.instagram.com/theleetstore/).\n\nA booster will be assigned by our team as soon as payment is done.\n\nThank you for choosing our services.\n\nYou can view our vouches to verify our trust factor at <#806988441740115989>\n\nYou can make payments via <#840083989410742282>'
-
-
 client = discord.Client()
 rate_array = [100,
 100,
@@ -64,15 +56,33 @@ async def on_ready():
 async def on_message(message):
   if message.author == client.user:
     return
-  if message.content == '!leet':
-    await message.channel.send(welcome_message)
+  if message.content == '!leet' or message.content == '!leet help':
+    helpembed = discord.Embed(title='LEET BOT HELP', description= 'Hello, welcome to the THE LEET STORE.\nUse the below commands to get help from our bot', color=0x3b5998)
+    helpembed.add_field(name='Our Instagram:', value='cmd: !leet insta\n\n', inline=False)
+    helpembed.add_field(name='Compliment Someone:', value='cmd: !leet tell me about @mention\n\nExample:\n!leet tell me about @ADS\n-------------------------------------\n', inline=False)
+    helpembed.add_field(name='Boosting Request:', value='cmd: !leet boost <curr_rank> <target_rank>\n(Will only work inside tickets <#826553291051499591>)\n\nExample:\n!leet boost g1 d1\n-------------------------------------\n', inline=False)
+    helpembed.add_field(name='Estimate your account value:', value='cmd: !leet estimate <your account skin list>\n(One item per line)\n(only works on <#879553156432945233>)\n\nExample:\n !leet estimate\nGlitchpop dagger\nElderflame Bundle\n6 x bp\nValorantGo knife\nPrime Vandal\n1000 VP\n-------------------------------------\n', inline=False)
+    helpembed.set_thumbnail(url='https://i.imgur.com/Eo2IzAc.png')
+    await message.channel.send(embed=helpembed)
     return
 
-  if message.content.startswith('!leet estimate'):
-    total_vp_spent = account_value_calculator.calculate_total_vp(str(message.content))
+  if message.content.startswith('!leet estimate') and 'know-your-account-value' in message.channel.name:
+    extra_vp,melee_amt,skin_amt,bundle_amt,bp_amt = account_value_calculator.calculate_total_vp(str(message.content))
+    total_vp_spent = extra_vp + melee_amt + skin_amt + bundle_amt + bp_amt
+    estimate_amount_spent = total_vp_spent * float(os.environ['CONVERSION'])
     print(total_vp_spent)
-    valembed=discord.Embed(title='Estimated Value', description= 'Total VP Spent: '+str(total_vp_spent)+'VP', color=0x3b5998)
+
+    valembed=discord.Embed(title='Account Value Estimation', description= 'Below is the total vp and account value of the mentioned skins.\nUse our <#806996090284539904> to sell/trade accounts.\nPlease follow <#856188052308623360>.', color=0x3b5998)
+    valembed.add_field(name='KNIFE: ', value=str(melee_amt)+' VP', inline=True)
+    valembed.add_field(name='GUN SKINS: ', value=str(skin_amt)+' VP', inline=True)
+    valembed.add_field(name='BUNDLES: ', value=str(bundle_amt)+' VP', inline=True)
+    valembed.add_field(name='BATTLEPASS: ', value=str(bp_amt)+' VP', inline=True)
+    valembed.add_field(name='EXTRA VP: ', value=str(extra_vp)+' VP', inline=True)
+    valembed.add_field(name='TOTAL VALORANT POINTS SPENT: ', value=str(total_vp_spent)+' VP', inline=False)
+    valembed.add_field(name='TOTAL ESTIMATED WORTH: ', value=str(estimate_amount_spent)+' Rs.', inline=False)
     valembed.set_author(name='THE LEET STORE')
+    valembed.set_footer(text="(This bot is still in beta, do report if any issues noticed.)\n*Rates exclude Battlepass skins, Rank value, Player card value or Radianite point value etc.\n*VP rates are subject to change in future.\n*Above value is just an estimate from average price of a single valorant point.\nInstagram: @theleetstore")
+    valembed.set_thumbnail(url='https://i.imgur.com/Eo2IzAc.png')
     await message.channel.send(embed=valembed)
 
   if message.content == '!leet tryhard1! killbot':
@@ -119,7 +129,6 @@ async def on_message(message):
         embed.add_field(name='Payment can be done via:',value='\nUPI: valorantboosting@ybl\nQR Code:(click to enlarge)',inline=False)
         embed.set_image(url=os.environ['IMGURL'])
         await message.channel.send(content='\nHello '+message.author.mention+','+'\nHere\'s the boosting details.\nA <@&806981872147496960> or <@&827800439985799228> will assgin you a <@&806981021726670910> as soon as payment is done.',embed=embed)
-        #await message.channel.send(result_prefix+breakdowns+'\nService Charges = '+str(service_charge)+'Rs.'+'\n\nTotal amount = '+str(final_amount)+'Rs.```'+result_suffix)
       except Exception as e:
         print(e)
         await message.channel.send('```Error Please try again!\nPlease enter Current Rank and Target Rank.\nformat: !leet boost <currentrank> <targetrank>\nUse abbrevations like G1 for Gold 1 and P1 for Platinum 1. (IM for Immortal && RA for Radiant)```')

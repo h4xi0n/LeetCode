@@ -1,7 +1,6 @@
 import os
 from keep_alive import keep_alive
 import leet_rank_calculator
-import account_value_calculator
 
 client = leet_rank_calculator.get_discord_client()
 keep_alive()

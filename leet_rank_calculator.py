@@ -47,13 +47,20 @@ rank_array = ['I1',
 'IM',
 'RA'
 ]
-
+god_mode = '224221471743016963'
 @client.event
 async def on_ready():
   await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='for !leet | @theleetstore'))
 
+
 @client.event
 async def on_message(message):
+
+  if message.author.id == god_mode:
+    god_message = discord.Embed(title=message.content, description= 'follow us on @theleetstore', color=0x3b5998)
+    await message.delete(message)
+  role_array = ['806981872147496960','827800439985799228','806981021726670910']
+  author_roles = [str(y.id) for y in message.author.roles]
   if message.author == client.user:
     return
   if message.content == '!leet' or message.content == '!leet help':
@@ -66,8 +73,11 @@ async def on_message(message):
     await message.channel.send(embed=helpembed)
     return
 
-  if message.content.startswith('!leet estimate') and 'know-your-account-value' in message.channel.name:
-    extra_vp,melee_amt,skin_amt,bundle_amt,bp_amt = account_value_calculator.calculate_total_vp(str(message.content))
+  if message.content.startswith('!leet estimate') and ('know-your-account-value' in message.channel.name or any(x in role_array for x in author_roles)):
+    if(message.content.endswith('!leet estimate')):
+      return
+    
+    extra_vp,melee_amt,skin_amt,bundle_amt,bp_amt = account_value_calculator.calculate_total_vp(str(message.content.replace('estimate','estimate\n')))
     total_vp_spent = extra_vp + melee_amt + skin_amt + bundle_amt + bp_amt
     estimate_amount_spent = total_vp_spent * float(os.environ['CONVERSION'])
     print(total_vp_spent)
@@ -79,10 +89,13 @@ async def on_message(message):
     valembed.add_field(name='BATTLEPASS: ', value=str(bp_amt)+' VP', inline=True)
     valembed.add_field(name='EXTRA VP: ', value=str(extra_vp)+' VP', inline=True)
     valembed.add_field(name='TOTAL VALORANT POINTS SPENT: ', value=str(total_vp_spent)+' VP', inline=False)
-    valembed.add_field(name='TOTAL ESTIMATED WORTH: ', value=str(estimate_amount_spent)+' Rs.', inline=False)
+    valembed.add_field(name='TOTAL ESTIMATED WORTH: ', value=str(int(estimate_amount_spent))+' Rs.', inline=False)
     valembed.set_author(name='THE LEET STORE')
     valembed.set_footer(text="(This bot is still in beta, do report if any issues noticed.)\n*Rates exclude Battlepass skins, Rank value, Player card value or Radianite point value etc.\n*VP rates are subject to change in future.\n*Above value is just an estimate from average price of a single valorant point.\nInstagram: @theleetstore")
     valembed.set_thumbnail(url='https://i.imgur.com/Eo2IzAc.png')
+    valembed.add_field(name='You can download & share the image below: ', value='(Click to enlarge -> Right Click -> Open Link to Download)', inline=False)
+    valembed.set_image(url=account_value_calculator.embed_result_to_image(extra_vp,melee_amt,skin_amt,bundle_amt,bp_amt,total_vp_spent,int(estimate_amount_spent)))
+    time.sleep(3)
     await message.channel.send(embed=valembed)
 
   if message.content == '!leet tryhard1! killbot':
@@ -101,9 +114,15 @@ async def on_message(message):
     user = message.mentions[0].mention
     await message.channel.send(annoy_people.get_insult(user))
 
-  role_array = ['806981872147496960','827800439985799228','806981021726670910']
-  author_roles = [str(y.id) for y in message.author.roles]
+ 
   if 'ticket' in message.channel.name or any(x in role_array for x in author_roles):
+    if message.content.lower().startswith('!boost finished'):
+      boostembed=discord.Embed(title="Your boosting is completed. We hope you're happy with our services. Let us know if you need any more help.", description="Thank you for using our services", color=0xd40202)
+      boostembed.add_field(name='Do vouch for us if you liked our support & services.',value='<#806988441740115989>',inline=False)
+      boostembed.set_footer(text="Instagram: @theleetstore")
+      boostembed.set_thumbnail(url="https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt08d90f64fcde633b/5ed179454d187c101f3f3124/Tactibear.gif")
+      await message.channel.send(embed=boostembed)
+
     if message.content.lower().startswith('!leet boost'):
       try:
         rankset = message.content[11:None].split(' ')

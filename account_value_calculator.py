@@ -1,4 +1,9 @@
 import json
+import re
+from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw 
+import upload_img
 
 def retrieve_data():
   data = open('skindata.json','r').read().lower()
@@ -25,21 +30,25 @@ def get_list_of_items(message):
   skin_list = []
   melee_list = []
   if '\n' in message:
-    lines_split = message.lower().split('\n')
+    lines_split = message.lower().split('\n') 
   else:
     lines_split = message.lower()
   battlepass_count = []
   extra_vp = 0
   for item in lines_split:
-    if item.endswith('battlepass') or item.endswith('bp'):
-      battlepass_count = [int(s) for s in item.split() if s.isdigit()]
-    elif item.endswith('vp'):
-      extra_vp = [int(s) for s in item.split() if s.isdigit()][0]
-    elif item.endswith('bundle'):
+    if item.strip().endswith('battlepass') or item.strip().endswith('bp') or item.strip().endswith('pass'):
+      battlepass_count = int(re.search(r'\d+', item).group())
+      if item.strip().startswith('all'):
+        battlepass_count = 8
+      #[int(s) for s in item.split() if s.isdigit()]
+    elif item.strip().endswith('vp') or ('radianite' not in item and item.strip().endswith('points')):
+      extra_vp = int(re.search(r'\d+', item).group())
+      #[int(s) for s in item.split() if s.isdigit()][0]
+    elif item.strip().endswith('bundle'):
       item_list1 = item.split(' ')
       for bundle_item in item_list1:
         bundle_list.append(bundle_item)
-    elif item.endswith('melee') or item.endswith('knife') or item.endswith('sword') or item.endswith('dagger') or item.endswith('axe'):
+    elif item.strip().endswith('melee') or item.strip().endswith('knife') or item.endswith('sword') or item.strip().endswith('dagger') or item.strip().endswith('axe') or item.strip().endswith('blade') or item.strip().endswith('baton') or item.strip().endswith('karambit') or item.strip().endswith('claw') or item.strip().endswith('balisong'):
       item_list2 = item.split(' ')
       for melee_item in item_list2:
         melee_list.append(melee_item)
@@ -56,11 +65,11 @@ def get_list_of_items(message):
   if not battlepass_count:
     count = 0
   else:
-    count = battlepass_count[0]
+    count = battlepass_count
   return extra_vp,item_list_melee,item_list_skins,item_list_bundle,count 
 
 def calculate_total_vp(message):
-  extra_vp,melee_set,skin_set,bundle_set,bp_count = get_list_of_items(message.replace('.',''))
+  extra_vp,melee_set,skin_set,bundle_set,bp_count = get_list_of_items(message.replace('.',' '))
   melee_data = get_melees()
   skin_data = get_skins()
   bundle_data = get_bundle()
@@ -108,6 +117,25 @@ def common_member(a,b):
         common_itemlist.append(item_i)
   return list(common_itemlist)
   
+def embed_result_to_image(extra_vp,melee_vp, skin_vp, bundle_vp, bp_total,vp_spent,total_amount):
+  img = Image.open("result.jpg")
+  draw = ImageDraw.Draw(img)
+  font_fname = 'FreeSansBold.ttf'
+  font_size = 62
+  large_font_size = 142
+  large_font = ImageFont.truetype(font_fname,large_font_size)
+  font = ImageFont.truetype(font_fname, font_size)
+  draw.text((1777, 546),str(skin_vp)+' VP',(255,255,255),font=font)
+  draw.text((2318, 546),str(bundle_vp)+' VP',(255,255,255),font=font)
+  draw.text((2790, 546),str(melee_vp)+' VP',(255,255,255),font=font)
+  draw.text((2010, 786),str(bp_total)+' VP',(255,255,255),font=font)
+  draw.text((2603, 786),str(extra_vp)+' VP',(255,255,255),font=font)
+  draw.text((1500, 1160),str(vp_spent)+' VP',(255,255,255),font=large_font)
+  draw.text((1500, 1380),str(total_amount)+' Rs.',(255,255,255),font=large_font)
+  img.save('sample-out.jpg')
+  url = upload_img.upload_image('sample-out.jpg')
+  print(url)
+  return url
 
 
 

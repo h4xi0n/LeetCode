@@ -30,9 +30,12 @@
 {"Nebula":" 7100"},
 {"Oni":"7100"},
 {"Sovereign":"7100"},
+{"Recon":"7100"},
 {"Prime":"8700"},
 {"SentinelsofLight":" 8700"},
 {"SOL":" 8700"},
+{"Sentinels":"8700"},
+{"Sentinel":"8700"},
 {"Ruination":" 8700"},
 {"BlastX":"8700"},
 {"Singularity":"8700"},
@@ -82,9 +85,12 @@
 {"Minima":"1275"},
 {"TetheredRealms":"1775"},
 {"Origin":"1775"},
+{"Recon":"1775"},
 {"Ruination":"2175"},
 {"SentinelsofLight":"2175"},
-{"SOL":"2175"}
+{"SOL":"2175"},
+{"Sentinels":"2175"},
+{"Sentinel":"2175"}
 ],
 
  "Melee":[
@@ -100,20 +106,32 @@
       {"Magepunk":"3550"},
       {"Nebula":"3550"},
       {"Oni":"3550"},
+   {"Oniclaw":"3550"},
       {"Origin":"3550"},
       {"Prime":"3550"},
       {"Reaver":"3550"},
       {"Sovereign":"3550"},
       {"Spline":"3550"},
       {"TetheredRealms":"3550"},
+   {"Tethered":"3550"},
       {"VALORANTGo":"3550"},
       {"VALORANT":"3550"},
+      {"Recon":"3550"},
+{"Butterfly":"3550"},
       {"BlastX":"4350"},
       {"Ruination":"4350"},
       {"Glitchpop":"4350"},
       {"SentinelsofLight":"4350"},
    {"SOL":"4350"},
+   {"Sentinels":"4350"},
+   {"Sentinel":"4350"},
       {"Singularity":"4350"},
       {"Elderflame":"4950"}
+   ],
+   "Default":[
+     "Classic",
+      "Shorty",
+      "Frenzy",
+      "Ghost"
    ]
 }

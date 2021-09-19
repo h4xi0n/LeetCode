@@ -47,7 +47,7 @@ rank_array = ['I1',
 'IM',
 'RA'
 ]
-god_mode = '224221471743016963'
+
 @client.event
 async def on_ready():
   await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='for !leet | @theleetstore'))
@@ -55,14 +55,19 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-
-  if message.author.id == god_mode:
-    god_message = discord.Embed(title=message.content, description= 'follow us on @theleetstore', color=0x3b5998)
-    await message.delete(message)
+  
+  god_mode = discord.utils.get(message.guild.roles, name="1337")
   role_array = ['806981872147496960','827800439985799228','806981021726670910']
   author_roles = [str(y.id) for y in message.author.roles]
+  
+  if message.content.startswith('..') and any(x in role_array for x in author_roles):
+    god_message = message.content.replace("..","")
+    await message.delete()
+    await message.channel.send(god_message)
+
   if message.author == client.user:
     return
+  
   if message.content == '!leet' or message.content == '!leet help':
     helpembed = discord.Embed(title='LEET BOT HELP', description= 'Hello, welcome to the THE LEET STORE.\nUse the below commands to get help from our bot', color=0x3b5998)
     helpembed.add_field(name='Our Instagram:', value='cmd: !leet insta\n\n', inline=False)
@@ -114,7 +119,10 @@ async def on_message(message):
     user = message.mentions[0].mention
     await message.channel.send(annoy_people.get_insult(user))
 
- 
+  if message.mention_everyone and not any(x in role_array for x in author_roles):
+    await message.author.send('Please do not mention everyone or here in THE LEET STORE! You have been warned!')
+    await message.delete()
+
   if 'ticket' in message.channel.name or any(x in role_array for x in author_roles):
     if message.content.lower().startswith('!boost finished'):
       boostembed=discord.Embed(title="Your boosting is completed. We hope you're happy with our services. Let us know if you need any more help.", description="Thank you for using our services", color=0xd40202)

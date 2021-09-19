@@ -40,7 +40,8 @@
 {"BlastX":"8700"},
 {"Singularity":"8700"},
 {"Glitchpop":"8700"},
-{"Elderflame":"9900"}
+{"Elderflame":"9900"},
+{"Spectrum":"10700"}
 ],
 
 "Skins":[
@@ -90,7 +91,8 @@
 {"SentinelsofLight":"2175"},
 {"SOL":"2175"},
 {"Sentinels":"2175"},
-{"Sentinel":"2175"}
+{"Sentinel":"2175"},
+{"Spectrum":"2675"}
 ],
 
  "Melee":[
@@ -126,7 +128,9 @@
    {"Sentinels":"4350"},
    {"Sentinel":"4350"},
       {"Singularity":"4350"},
-      {"Elderflame":"4950"}
+      {"Elderflame":"4950"},
+      {"Spectrum":"5350"},
+      {"Waveform":"5350"}
    ],
    "Default":[
      "Classic",

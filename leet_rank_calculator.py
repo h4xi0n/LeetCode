@@ -4,27 +4,35 @@ import time
 import annoy_people
 import social_embed
 import account_value_calculator
-
-client = discord.Client()
-rate_array = [100,
-100,
-175,
-175,
-175,
-200,
-200,
-200,
-450,
-450,
-450,
+import discord.utils
+#from discord.utils import get
+intents = discord.Intents.all()
+intents.members = True
+intents.guilds = True
+intents.reactions = True
+client = discord.Client(intents=intents)
+#client= commands.Bot(command_prefix="!", intents=intents)
+rate_array = [30,
+40,
+50,
+60,
+70,
+80,
+95,
+130,
+150,
+179,
+220,
+275,
+330,
+430,
+550,
 750,
-750,
-750,
-1500,
-1500,
-1500,
+1250,
+1750,
+3000,
 3500,
-10000]
+7000]
 
 rank_array = ['I1',
 'I2',
@@ -44,7 +52,9 @@ rank_array = ['I1',
 'D1',
 'D2',
 'D3',
-'IM',
+'IM1',
+'IM2',
+'IM3',
 'RA'
 ]
 
@@ -55,19 +65,31 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+  if message.author == client.user:
+    return
   
-  god_mode = discord.utils.get(message.guild.roles, name="1337")
+  
   role_array = ['806981872147496960','827800439985799228','806981021726670910']
   author_roles = [str(y.id) for y in message.author.roles]
   
+  if not any(x in role_array for x in author_roles) and not 'ticket' in message.channel.name:
+    if 'boosting' in message.content.lower() or 'boost' in message.content.lower():
+      channel = client.get_channel(933741314330202143)
+      warnembed = discord.Embed(title='LEET BOT WARNINGS',description = message.author.name+' has been messaged personally regarding our boosting service',color=0x3b5998)
+      warnembed.add_field(name='His message content from channel '+message.channel.name,value=message.content)
+      
+      await channel.send(embed=warnembed)
+      await message.delete()
+      await message.author.send("Please use <#826553291051499591> to raise a ticket and request for our boosting service. Our boosting rates are <#806985172049723422>")
+
+
+
+
   if message.content.startswith('..') and any(x in role_array for x in author_roles):
     god_message = message.content.replace("..","")
     await message.delete()
     await message.channel.send(god_message)
 
-  if message.author == client.user:
-    return
-  
   if message.content == '!leet' or message.content == '!leet help':
     helpembed = discord.Embed(title='LEET BOT HELP', description= 'Hello, welcome to the THE LEET STORE.\nUse the below commands to get help from our bot', color=0x3b5998)
     helpembed.add_field(name='Our Instagram:', value='cmd: !leet insta\n\n', inline=False)
@@ -78,7 +100,49 @@ async def on_message(message):
     await message.channel.send(embed=helpembed)
     return
 
-  if message.content.startswith('!leet estimate') and ('know-your-account-value' in message.channel.name or any(x in role_array for x in author_roles)):
+  if message.content.lower().startswith('!add ') and any(x in role_array for x in author_roles):
+    user = message.mentions[0]
+    overwrite = discord.PermissionOverwrite()
+    overwrite.send_messages = True
+    overwrite.read_messages = True
+    overwrite.attach_files = True
+    overwrite.read_message_history = True
+    await message.channel.set_permissions(user, overwrite=overwrite)
+    time.sleep(4)
+    booster_embed = discord.Embed(title = 'Booster Details ', description = 'Your booster will be '+user.name+', He will help you reach the rank you desire in no time.', color=0x3b5998)
+    booster_embed.set_author(name="THE LEET STORE")
+    booster_embed.set_thumbnail(url="https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt08d90f64fcde633b/5ed179454d187c101f3f3124/Tactibear.gif")
+    booster_embed.set_footer(text="Instagram: @theleetstore")
+    await message.delete()
+    await message.channel.send(embed=booster_embed)
+
+  if message.content.lower().startswith('!remove ') and any(x in role_array for x in author_roles):
+    user = message.mentions[0]
+    ticket_channel = message.channel
+    overwrite = discord.PermissionOverwrite()
+    overwrite.send_messages = False
+    overwrite.read_messages = False
+    overwrite.attach_files = False
+    overwrite.read_message_history = False
+    await ticket_channel.set_permissions(user, overwrite=overwrite)
+
+  if message.content.lower().startswith('!pay'):
+    payembed = discord.Embed(title = 'Payment Details ', description = 'Use the below methods to make your payments', color=0x3b5998)
+    payembed.add_field(name='Check out our vouches at:',value='<#806988441740115989>',inline=False)
+    payembed.add_field(name='UPI',value='\nvalorantboosting@ybl',inline=False)
+    payembed.add_field(name='QR CODE',value='QR Code:(click to enlarge)',inline=False)
+    payembed.set_image(url=os.environ['IMGURL'])
+    payembed.set_author(name="THE LEET STORE")
+    payembed.set_thumbnail(url="https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt08d90f64fcde633b/5ed179454d187c101f3f3124/Tactibear.gif")
+    payembed.set_footer(text="Instagram: @theleetstore")
+    await message.delete()
+    await message.channel.send(embed=payembed)
+
+  if message.content.lower().startswith('!sale'):
+    await message.delete()
+    await message.channel.send(embed=get_account_sale_embed())
+
+  if message.content.startswith('!leet estimate') and ('know-valo-account-value' in message.channel.name or any(x in role_array for x in author_roles)):
     if(message.content.endswith('!leet estimate')):
       return
     
@@ -99,14 +163,11 @@ async def on_message(message):
     valembed.set_footer(text="(This bot is still in beta, do report if any issues noticed.)\n*Rates exclude Battlepass skins, Rank value, Player card value or Radianite point value etc.\n*VP rates are subject to change in future.\n*Above value is just an estimate from average price of a single valorant point.\nInstagram: @theleetstore")
     valembed.set_thumbnail(url='https://i.imgur.com/Eo2IzAc.png')
     valembed.add_field(name='You can download & share the image below: ', value='(Click to enlarge -> Right Click -> Open Link to Download)', inline=False)
-    valembed.set_image(url=account_value_calculator.embed_result_to_image(extra_vp,melee_amt,skin_amt,bundle_amt,bp_amt,total_vp_spent,int(estimate_amount_spent)))
+    img_url=account_value_calculator.embed_result_to_image(extra_vp,melee_amt,skin_amt,bundle_amt,bp_amt,total_vp_spent,int(estimate_amount_spent))
+    valembed.add_field(name='Image URL ', value=str(img_url), inline=False)
+    valembed.set_image(url=img_url)
     time.sleep(3)
     await message.channel.send(embed=valembed)
-
-  if message.content == '!leet tryhard1! killbot':
-    await message.channel.send('I\'m suiciding! Good bye, cruel world!')
-    await client.close()
-    exit()
 
   if message.content == '!leet insta':
     await message.channel.send(embed = social_embed.get_instagram_embed('@theleetstore','https://www.instagram.com/theleetstore/','Hardstuck? Dm us!\nWe can help!\nWe have 20+ pro diamond/immortal boosters.\nOur vouches (in discord) shows our quality of work.','https://i.imgur.com/HcqZzKN.png','THE LEET STORE'))
@@ -124,12 +185,20 @@ async def on_message(message):
     await message.delete()
 
   if 'ticket' in message.channel.name or any(x in role_array for x in author_roles):
-    if message.content.lower().startswith('!boost finished'):
+    if message.content.lower().startswith('!boost finished') or message.content.lower().startswith('!bf'):
       boostembed=discord.Embed(title="Your boosting is completed. We hope you're happy with our services. Let us know if you need any more help.", description="Thank you for using our services", color=0xd40202)
       boostembed.add_field(name='Do vouch for us if you liked our support & services.',value='<#806988441740115989>',inline=False)
       boostembed.set_footer(text="Instagram: @theleetstore")
       boostembed.set_thumbnail(url="https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt08d90f64fcde633b/5ed179454d187c101f3f3124/Tactibear.gif")
+      await message.delete()
       await message.channel.send(embed=boostembed)
+
+    if message.content.lower().startswith('!pr'):
+      recembed = discord.Embed(title='Payment Received.',description='Thank you for trusting in our services, a booster will be assigned as soon as possible!',color=0xd40202)
+      recembed.set_footer(text="Instagram: @theleetstore")
+      recembed.set_thumbnail(url="https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt08d90f64fcde633b/5ed179454d187c101f3f3124/Tactibear.gif")
+      await message.delete()
+      await message.channel.send(embed=recembed)
 
     if message.content.lower().startswith('!leet boost'):
       try:
@@ -148,17 +217,20 @@ async def on_message(message):
         
         embed=discord.Embed(title="Total Amount: "+str(final_amount)+'Rs.', description="Here's the rate breakdown:", color=0xd40202)
         breakdown(rankset[1],rankset[2],embed)
-        embed.set_author(name="THE LEET STORE")
-        embed.set_thumbnail(url="https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt08d90f64fcde633b/5ed179454d187c101f3f3124/Tactibear.gif")
-        embed.set_footer(text="Instagram: @theleetstore")
         embed.add_field(name='Service Charge: ', value=str(service_charge)+'Rs.', inline=False)
-        embed.add_field(name='Check out our vouches at:',value='<#806988441740115989>',inline=False)
-        embed.add_field(name='Payment can be done via:',value='\nUPI: valorantboosting@ybl\nQR Code:(click to enlarge)',inline=False)
-        embed.set_image(url=os.environ['IMGURL'])
-        await message.channel.send(content='\nHello '+message.author.mention+','+'\nHere\'s the boosting details.\nA <@&806981872147496960> or <@&827800439985799228> will assgin you a <@&806981021726670910> as soon as payment is done.',embed=embed)
+        if 'bot' in message.channel.name: 
+          await message.channel.send(embed=embed)
+        else:
+          embed.set_author(name="THE LEET STORE")
+          embed.set_thumbnail(url="https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt08d90f64fcde633b/5ed179454d187c101f3f3124/Tactibear.gif") 
+          embed.set_footer(text="Note: Our rates may seem a little pricy, the reason is we do not use any third party hacks or apps which assists our boosters.\nYour rank will be boosted by esports level players on depending rank. \nInstagram: @theleetstore")
+          embed.add_field(name='Check out our vouches at:',value='<#806988441740115989>',inline=False)
+          embed.add_field(name='Payment can be done via:',value='\nUPI: valorantboosting@ybl\nQR Code:(click to enlarge)',inline=False)
+          embed.set_image(url=os.environ['IMGURL'])
+          await message.channel.send(content='\nHello '+message.author.mention+','+'\nHere\'s the boosting details.\nA <@&806981872147496960> or <@&827800439985799228> will assgin you a booster as soon as payment is done.',embed=embed)
       except Exception as e:
         print(e)
-        await message.channel.send('```Error Please try again!\nPlease enter Current Rank and Target Rank.\nformat: !leet boost <currentrank> <targetrank>\nUse abbrevations like G1 for Gold 1 and P1 for Platinum 1. (IM for Immortal && RA for Radiant)```')
+        await message.channel.send('```Error Please try again!\nPlease enter Current Rank and Target Rank.\nformat: !leet boost <currentrank> <targetrank>\nUse abbrevations like G1 for Gold 1 and P1 for Platinum 1. (IM1 for Immortal 1 && RA for Radiant)```')
     else:
       return
   else:
@@ -170,17 +242,34 @@ async def on_guild_channel_create(channel):
   print(channel.name)
   if 'ticket' in channel.name:
     time.sleep(4)
+    async for messages in channel.history(limit = 1):
+      await channel.edit(name=channel.name+'_['+messages.mentions[0].name+']')
+      
     welcome_embed = discord.Embed(title='How to request our top-notch boosting service', description='Use the below command to request \nfor our boosting service', color=0xd40202)
     welcome_embed.set_thumbnail(url="https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt08d90f64fcde633b/5ed179454d187c101f3f3124/Tactibear.gif")
     welcome_embed.set_author(name="THE LEET BOOSTING SERVICE")
     welcome_embed.add_field(name='Command format: ',value='!leet boost <currentrank> <targetrank>',inline=False)
     welcome_embed.add_field(name ='Example:',value='!leet boost g1 d1',inline = False)
     welcome_embed.add_field(name ='Our rate sheet:',value='(click to enlarge image)',inline = False)
-    welcome_embed.set_image(url='https://i.imgur.com/HcqZzKN.png')
-    welcome_embed.set_footer(text="Use abbrevations like G1 for Gold 1 and P1 for Platinum 1. \n(IM for Immortal && RA for Radiant)")
+    welcome_embed.set_image(url='https://media.discordapp.net/attachments/806985172049723422/929952429871616021/NEWLEETNOTICE-January_New_Act.png')
+    welcome_embed.set_footer(text="Use abbrevations like G1 for Gold 1 and P1 for Platinum 1. \n(IM2 for Immortal 2 && RA for Radiant)")
     await channel.send(embed = welcome_embed)
+
+    #await channel.edit(name=channel.name+' ['++']')
   return
-  
+
+def get_account_sale_embed():
+    acc_sale_embed = discord.Embed(title='For account sales please use the following channels', description='The LEET Store does not sell your account personally, We only do middleman service for a minor fee',color=0xd40202)
+    acc_sale_embed.set_author(name="THE LEET STORE")
+    acc_sale_embed.set_thumbnail(url="https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt08d90f64fcde633b/5ed179454d187c101f3f3124/Tactibear.gif")
+    acc_sale_embed.add_field(name ='Valorant Account Sales',value='<#806996090284539904>',inline=False)
+    acc_sale_embed.add_field(name ='Steam Account and Inventory Trade', value= '<#902796038706962504>',inline=False)
+    acc_sale_embed.add_field(name ='Market for any other random stuff',value='<#902796088933744661>',inline=False)
+    acc_sale_embed.add_field(name ='Valorant accounts by The LEET Store',value ='<#855139318300147773>',inline=False)
+    acc_sale_embed.set_footer(text='Follow us on instagram @theleetstore / @valorant.boosters')
+    print(acc_sale_embed)
+    return acc_sale_embed
+
 
 def calculate_rate(start_rank,end_rank):
   print('Calculating rates')
@@ -216,13 +305,13 @@ def breakdown(start_rank,end_rank,embed):
   return breaked_down_data
 
 def get_service_charge(amount):
-  if amount > 2000:
+  if amount > 1000:
     amount = 100
     return amount
-  if amount > 1000:
+  if amount > 700:
     amount = 50
     return amount
-  if amount > 500:
+  if amount > 200:
     amount = 25
     return amount
   else:

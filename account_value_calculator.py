@@ -66,6 +66,8 @@ def get_list_of_items(message):
     count = 0
   else:
     count = battlepass_count
+
+  print(item_list_skins)
   return extra_vp,item_list_melee,item_list_skins,item_list_bundle,count 
 
 def calculate_total_vp(message):
@@ -86,6 +88,7 @@ def calculate_total_vp(message):
   for skin in skin_set:
     for skinobject in skin_data:
       try:
+        print('skin_vp '+skinobject[skin])
         skin_vp = skin_vp + int(skinobject[skin])
       except:
         pass

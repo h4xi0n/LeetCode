@@ -50,11 +50,13 @@
 {"MagepunkII":"7100"},
 {"Magepunk2":"7100"},
 {"Champions":"6263"},
-{"Snowfall":"5100"}
+{"Snowfall":"5100"},
+{"Protocol":"9900"}
 
 ],
 
 "Skins":[
+{"Protocol":"2475"},
 {"Luxe":"875"},
 {"Champions":"2675"},
 {"Aristocrat":"1275"},
@@ -114,6 +116,7 @@
 ],
 
  "Melee":[
+     {"Protocol":"4950"},
      {"Luxe":"1750"},
      {"Champions":"5350"},
      {"Snowfall":"2550"},

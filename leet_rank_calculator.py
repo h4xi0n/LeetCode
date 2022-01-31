@@ -5,6 +5,7 @@ import annoy_people
 import social_embed
 import account_value_calculator
 import discord.utils
+from discord.utils import get
 #from discord.utils import get
 intents = discord.Intents.all()
 intents.members = True
@@ -72,7 +73,7 @@ async def on_message(message):
   role_array = ['806981872147496960','827800439985799228','806981021726670910']
   author_roles = [str(y.id) for y in message.author.roles]
   
-  if not any(x in role_array for x in author_roles) and not 'ticket' in message.channel.name:
+  if not any(x in role_array for x in author_roles) and not 'ticket' in message.channel.name and not 'vouch-for-us' in message.channel.name:
     if 'boosting' in message.content.lower() or 'boost' in message.content.lower():
       channel = client.get_channel(933741314330202143)
       warnembed = discord.Embed(title='LEET BOT WARNINGS',description = message.author.name+' has been messaged personally regarding our boosting service',color=0x3b5998)
@@ -83,7 +84,13 @@ async def on_message(message):
       await message.author.send("Please use <#826553291051499591> to raise a ticket and request for our boosting service. Our boosting rates are <#806985172049723422>")
 
 
+  if 'vouch-for-us' in message.channel.name and message.content.startswith('!anon'):
+    vouch_embed = discord.Embed(title='VOUCH POST', description ='This post is done by a customer who wants to stay anonymous')
+    vouch_embed.add_field(name='Vouch message',value=message.content.replace('!anon ',''))
+    vouch_embed.set_author(name="THE LEET STORE")
 
+  if 879553156432945233 == message.channel.id and not message.content.startswith('!leet estimate'):
+    message.delete()
 
   if message.content.startswith('..') and any(x in role_array for x in author_roles):
     god_message = message.content.replace("..","")
@@ -142,6 +149,7 @@ async def on_message(message):
     await message.delete()
     await message.channel.send(embed=get_account_sale_embed())
 
+
   if message.content.startswith('!leet estimate') and ('know-valo-account-value' in message.channel.name or any(x in role_array for x in author_roles)):
     if(message.content.endswith('!leet estimate')):
       return
@@ -194,9 +202,16 @@ async def on_message(message):
       await message.channel.send(embed=boostembed)
 
     if message.content.lower().startswith('!pr'):
-      recembed = discord.Embed(title='Payment Received.',description='Thank you for trusting in our services, a booster will be assigned as soon as possible!',color=0xd40202)
+      recembed = discord.Embed(title='Payment Received.',description='Thank you for trusting in our services, a booster will be assigned as soon as possible! Feel free to share your credentials here. It\'s safe.',color=0xd40202)
       recembed.set_footer(text="Instagram: @theleetstore")
       recembed.set_thumbnail(url="https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt08d90f64fcde633b/5ed179454d187c101f3f3124/Tactibear.gif")
+      role = get(message.guild.roles, name="Active Customers")
+      if message.mentions:
+        user_id = message.mentions[0].id
+        member = message.guild.get_member(user_id)
+        print(member)
+        print(role)
+        await member.add_roles(role)
       await message.delete()
       await message.channel.send(embed=recembed)
 
@@ -214,7 +229,11 @@ async def on_message(message):
       
         service_charge = get_service_charge(rank_amount)
         final_amount = service_charge + rank_amount
-        
+
+        razer = message.guild.get_member(224221471743016963)
+
+        await razer.send("```Member Name: "+message.author.name+"\nChannel: "+message.channel.name+"\nBoosting Amount: "+str(rank_amount)+"Rs."+"\nService Charge: "+str(service_charge)+"Rs.```")
+
         embed=discord.Embed(title="Total Amount: "+str(final_amount)+'Rs.', description="Here's the rate breakdown:", color=0xd40202)
         breakdown(rankset[1],rankset[2],embed)
         embed.add_field(name='Service Charge: ', value=str(service_charge)+'Rs.', inline=False)
@@ -223,14 +242,14 @@ async def on_message(message):
         else:
           embed.set_author(name="THE LEET STORE")
           embed.set_thumbnail(url="https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt08d90f64fcde633b/5ed179454d187c101f3f3124/Tactibear.gif") 
-          embed.set_footer(text="Note: Our rates may seem a little pricy, the reason is we do not use any third party hacks or apps which assists our boosters.\nYour rank will be boosted by esports level players on depending rank. \nInstagram: @theleetstore")
+          embed.set_footer(text="Note: Our rates have been reduced, There will be a small delay in our services due to abundant amount of service requests.\nYour rank will be boosted by esports level players on depending rank. \nInstagram: @theleetstore")
           embed.add_field(name='Check out our vouches at:',value='<#806988441740115989>',inline=False)
           embed.add_field(name='Payment can be done via:',value='\nUPI: valorantboosting@ybl\nQR Code:(click to enlarge)',inline=False)
           embed.set_image(url=os.environ['IMGURL'])
           await message.channel.send(content='\nHello '+message.author.mention+','+'\nHere\'s the boosting details.\nA <@&806981872147496960> or <@&827800439985799228> will assgin you a booster as soon as payment is done.',embed=embed)
       except Exception as e:
         print(e)
-        await message.channel.send('```Error Please try again!\nPlease enter Current Rank and Target Rank.\nformat: !leet boost <currentrank> <targetrank>\nUse abbrevations like G1 for Gold 1 and P1 for Platinum 1. (IM1 for Immortal 1 && RA for Radiant)```')
+        await message.channel.send('```Error Please try again!\nPlease enter the correct syntax. ie.\nformat: !leet boost <currentrank> <targetrank>\nUse abbrevations like G1 for Gold 1 and P1 for Platinum 1. (IM1 for Immortal 1 && RA for Radiant)\n\nExample:\n!leet boost g1 d1```')
     else:
       return
   else:
@@ -305,18 +324,8 @@ def breakdown(start_rank,end_rank,embed):
   return breaked_down_data
 
 def get_service_charge(amount):
-  if amount > 1000:
-    amount = 100
-    return amount
-  if amount > 700:
-    amount = 50
-    return amount
-  if amount > 200:
-    amount = 25
-    return amount
-  else:
-    amount = 15
-    return amount
+  service_charge = amount * .15
+  return int(service_charge)
 
 def get_discord_client():
   return client

@@ -1,18 +1,22 @@
 import os
 import discord
 import time
+from datetime import datetime
 import annoy_people
 import social_embed
 import account_value_calculator
 import discord.utils
 from discord.utils import get
+import upload_img
 #from discord.utils import get
 intents = discord.Intents.all()
 intents.members = True
 intents.guilds = True
 intents.reactions = True
+
 client = discord.Client(intents=intents)
 #client= commands.Bot(command_prefix="!", intents=intents)
+today = datetime.now()
 rate_array = [30,
 40,
 50,
@@ -74,7 +78,7 @@ async def on_message(message):
   author_roles = [str(y.id) for y in message.author.roles]
   
   if not any(x in role_array for x in author_roles) and not 'ticket' in message.channel.name and not 'vouch-for-us' in message.channel.name:
-    if 'boosting' in message.content.lower() or 'boost' in message.content.lower():
+    if 'boosting' in message.content.lower() or 'boost' in message.content.lower() or 'rank push' in message.content.lower() or 'pushing rank' in message.content.lower() or 'rank pushing' in message.content.lower():
       channel = client.get_channel(933741314330202143)
       warnembed = discord.Embed(title='LEET BOT WARNINGS',description = message.author.name+' has been messaged personally regarding our boosting service',color=0x3b5998)
       warnembed.add_field(name='His message content from channel '+message.channel.name,value=message.content)
@@ -84,7 +88,7 @@ async def on_message(message):
       await message.author.send("Please use <#826553291051499591> to raise a ticket and request for our boosting service. Our boosting rates are <#806985172049723422>")
 
 
-  if 'vouch-for-us' in message.channel.name and message.content.startswith('!anon'):
+  if ('vouch-for-us' in message.channel.name and message.content.startswith('!anon')) or any(x in role_array for x in author_roles):
     vouch_embed = discord.Embed(title='VOUCH POST', description ='This post is done by a customer who wants to stay anonymous')
     vouch_embed.add_field(name='Vouch message',value=message.content.replace('!anon ',''))
     vouch_embed.set_author(name="THE LEET STORE")
@@ -172,7 +176,7 @@ async def on_message(message):
     valembed.set_thumbnail(url='https://i.imgur.com/Eo2IzAc.png')
     valembed.add_field(name='You can download & share the image below: ', value='(Click to enlarge -> Right Click -> Open Link to Download)', inline=False)
     img_url=account_value_calculator.embed_result_to_image(extra_vp,melee_amt,skin_amt,bundle_amt,bp_amt,total_vp_spent,int(estimate_amount_spent))
-    valembed.add_field(name='Image URL ', value=str(img_url), inline=False)
+    valembed.add_field(name='Image URL ', value=str(upload_img.shorten(img_url)), inline=False)
     valembed.set_image(url=img_url)
     time.sleep(3)
     await message.channel.send(embed=valembed)
@@ -200,6 +204,11 @@ async def on_message(message):
       boostembed.set_thumbnail(url="https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt08d90f64fcde633b/5ed179454d187c101f3f3124/Tactibear.gif")
       await message.delete()
       await message.channel.send(embed=boostembed)
+
+    if '!con' in message.content.lower():
+      await message.delete()
+      await message.channel.send("50Rs extra per condition/rule.")
+
 
     if message.content.lower().startswith('!pr'):
       recembed = discord.Embed(title='Payment Received.',description='Thank you for trusting in our services, a booster will be assigned as soon as possible! Feel free to share your credentials here. It\'s safe.',color=0xd40202)
@@ -229,20 +238,24 @@ async def on_message(message):
       
         service_charge = get_service_charge(rank_amount)
         final_amount = service_charge + rank_amount
-
+        
         razer = message.guild.get_member(224221471743016963)
+        transcript_channel = message.guild.get_channel(938542775710933072)
+        channel_msg = "```"+"\nDate\t\t\t\t\t:"+today.strftime("%d/%m/%Y %H:%M:%S")+"\nCustomer\t\t\t\t:"+message.author.name+"\nChannel \t\t\t\t:"+message.channel.name+"\nBooster Fee \t\t\t:"+str(rank_amount)+"Rs."+"\nService Charge  \t\t:"+str(service_charge)+"Rs.(18%)"+"\nTotal Amount\t\t\t:"+str(final_amount)+"Rs.```"
+        
+        await razer.send(channel_msg)
+        
+        await transcript_channel.send(channel_msg)
 
-        await razer.send("```Member Name: "+message.author.name+"\nChannel: "+message.channel.name+"\nBoosting Amount: "+str(rank_amount)+"Rs."+"\nService Charge: "+str(service_charge)+"Rs.```")
 
         embed=discord.Embed(title="Total Amount: "+str(final_amount)+'Rs.', description="Here's the rate breakdown:", color=0xd40202)
-        breakdown(rankset[1],rankset[2],embed)
-        embed.add_field(name='Service Charge: ', value=str(service_charge)+'Rs.', inline=False)
+        breakdown(rankset[1],rankset[2],embed,service_charge)
         if 'bot' in message.channel.name: 
           await message.channel.send(embed=embed)
         else:
           embed.set_author(name="THE LEET STORE")
           embed.set_thumbnail(url="https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt08d90f64fcde633b/5ed179454d187c101f3f3124/Tactibear.gif") 
-          embed.set_footer(text="Note: Our rates have been reduced, There will be a small delay in our services due to abundant amount of service requests.\nYour rank will be boosted by esports level players on depending rank. \nInstagram: @theleetstore")
+          embed.set_footer(text="Note: Our rates have been reduced, There will be a small delay in our services due to abundant amount of service requests.\nA minor service charge has been added.\nYour rank will be boosted by esports level players on depending rank. \nInstagram: @theleetstore")
           embed.add_field(name='Check out our vouches at:',value='<#806988441740115989>',inline=False)
           embed.add_field(name='Payment can be done via:',value='\nUPI: valorantboosting@ybl\nQR Code:(click to enlarge)',inline=False)
           embed.set_image(url=os.environ['IMGURL'])
@@ -271,7 +284,7 @@ async def on_guild_channel_create(channel):
     welcome_embed.add_field(name ='Example:',value='!leet boost g1 d1',inline = False)
     welcome_embed.add_field(name ='Our rate sheet:',value='(click to enlarge image)',inline = False)
     welcome_embed.set_image(url='https://media.discordapp.net/attachments/806985172049723422/929952429871616021/NEWLEETNOTICE-January_New_Act.png')
-    welcome_embed.set_footer(text="Use abbrevations like G1 for Gold 1 and P1 for Platinum 1. \n(IM2 for Immortal 2 && RA for Radiant)")
+    welcome_embed.set_footer(text="Extra 50Rs/Rule or Condition\nUse abbrevations like G1 for Gold 1 and P1 for Platinum 1. \n(IM2 for Immortal 2 && RA for Radiant)")
     await channel.send(embed = welcome_embed)
 
     #await channel.edit(name=channel.name+' ['++']')
@@ -306,25 +319,27 @@ def calculate_rate(start_rank,end_rank):
     total_amount = total_amount+amount
   return total_amount
 
-def breakdown(start_rank,end_rank,embed):
+def breakdown(start_rank,end_rank,embed,service_charge):
   start_index = rank_array.index(start_rank.upper())
   end_index = rank_array.index(end_rank.upper())
   breaked_down_data = ""
+  
   sub_rank_array = rank_array[start_index:end_index+1]
   sub_rate_array = rate_array[start_index:end_index]
+  broken_sc = int(service_charge/len(sub_rate_array))
   i = 0
   for rate in sub_rate_array:
     current_rank = sub_rank_array[i]
     next_rank = sub_rank_array[i+1]
     i=i+1
-    embed.add_field(name=current_rank+' to '+next_rank+': ',value = str(rate)+'Rs.', inline=True)
+    embed.add_field(name=current_rank+' to '+next_rank+': ',value = str(rate+broken_sc)+'Rs.', inline=True)
     breaked_down_data = breaked_down_data + current_rank+' to '+next_rank+' = '+str(rate)+'Rs\n'
     if sub_rate_array.index(rate) == len(sub_rate_array):
       break
   return breaked_down_data
 
 def get_service_charge(amount):
-  service_charge = amount * .15
+  service_charge = amount * .18
   return int(service_charge)
 
 def get_discord_client():

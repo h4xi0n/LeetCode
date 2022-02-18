@@ -2,6 +2,7 @@ import os
 import discord
 import time
 from datetime import datetime
+import pytz
 import annoy_people
 import social_embed
 import account_value_calculator
@@ -16,7 +17,7 @@ intents.reactions = True
 
 client = discord.Client(intents=intents)
 #client= commands.Bot(command_prefix="!", intents=intents)
-today = datetime.now()
+today = datetime.now(tz=pytz.timezone("Asia/Kolkata"))
 rate_array = [30,
 40,
 50,
@@ -241,7 +242,7 @@ async def on_message(message):
         
         razer = message.guild.get_member(224221471743016963)
         transcript_channel = message.guild.get_channel(938542775710933072)
-        channel_msg = "```"+"\nDate\t\t\t\t\t:"+today.strftime("%d/%m/%Y %H:%M:%S")+"\nCustomer\t\t\t\t:"+message.author.name+"\nChannel \t\t\t\t:"+message.channel.name+"\nBooster Fee \t\t\t:"+str(rank_amount)+"Rs."+"\nService Charge  \t\t:"+str(service_charge)+"Rs.(18%)"+"\nTotal Amount\t\t\t:"+str(final_amount)+"Rs.```"
+        channel_msg = "```"+"\nDate\t\t\t\t\t:"+today.strftime("%d/%m/%Y %H:%M:%S")+"\nCustomer\t\t\t\t:"+message.author.name+"\nChannel \t\t\t\t:"+message.channel.name+"\nRank\t\t\t\t\t:"+rankset[1].upper()+" to "+rankset[2].upper()+"\nBooster Fee \t\t\t:"+str(rank_amount)+"Rs."+"\nService Charge  \t\t:"+str(service_charge)+"Rs.(18%)"+"\nTotal Amount\t\t\t:"+str(final_amount)+"Rs.```"
         
         await razer.send(channel_msg)
         

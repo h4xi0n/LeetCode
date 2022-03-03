@@ -18,21 +18,21 @@ intents.reactions = True
 client = discord.Client(intents=intents)
 #client= commands.Bot(command_prefix="!", intents=intents)
 today = datetime.now(tz=pytz.timezone("Asia/Kolkata"))
-rate_array = [30,
-40,
-50,
+rate_array = [50,
 60,
 70,
-80,
-95,
-130,
-150,
-179,
-220,
-275,
-330,
-430,
-550,
+90,
+105,
+120,
+135,
+160,
+185,
+225,
+270,
+325,
+365,
+450,
+625,
 750,
 1250,
 1750,
@@ -242,7 +242,7 @@ async def on_message(message):
         
         razer = message.guild.get_member(224221471743016963)
         transcript_channel = message.guild.get_channel(938542775710933072)
-        channel_msg = "```"+"\nDate\t\t\t\t\t:"+today.strftime("%d/%m/%Y %H:%M:%S")+"\nCustomer\t\t\t\t:"+message.author.name+"\nChannel \t\t\t\t:"+message.channel.name+"\nRank\t\t\t\t\t:"+rankset[1].upper()+" to "+rankset[2].upper()+"\nBooster Fee \t\t\t:"+str(rank_amount)+"Rs."+"\nService Charge  \t\t:"+str(service_charge)+"Rs.(18%)"+"\nTotal Amount\t\t\t:"+str(final_amount)+"Rs.```"
+        channel_msg = "```"+"\nDate\t\t\t\t\t:"+today.strftime("%d/%m/%Y %H:%M:%S")+"\nCustomer\t\t\t\t:"+message.author.name+"\nChannel \t\t\t\t:"+message.channel.name+"\nRank\t\t\t\t\t:"+rankset[1].upper()+" to "+rankset[2].upper()+"\nBooster Fee \t\t\t:"+str(rank_amount)+"Rs."+"\nService Charge  \t\t:"+str(service_charge)+"Rs.(14%)"+"\nTotal Amount\t\t\t:"+str(final_amount)+"Rs.```"
         
         await razer.send(channel_msg)
         
@@ -284,7 +284,7 @@ async def on_guild_channel_create(channel):
     welcome_embed.add_field(name='Command format: ',value='!leet boost <currentrank> <targetrank>',inline=False)
     welcome_embed.add_field(name ='Example:',value='!leet boost g1 d1',inline = False)
     welcome_embed.add_field(name ='Our rate sheet:',value='(click to enlarge image)',inline = False)
-    welcome_embed.set_image(url='https://media.discordapp.net/attachments/806985172049723422/929952429871616021/NEWLEETNOTICE-January_New_Act.png')
+    welcome_embed.set_image(url='https://cdn.discordapp.com/attachments/806985172049723422/948566041506766888/NEWLEETNOTICE-MARCH2022-2_new.png')
     welcome_embed.set_footer(text="Extra 50Rs/Rule or Condition\nUse abbrevations like G1 for Gold 1 and P1 for Platinum 1. \n(IM2 for Immortal 2 && RA for Radiant)")
     await channel.send(embed = welcome_embed)
 
@@ -340,7 +340,7 @@ def breakdown(start_rank,end_rank,embed,service_charge):
   return breaked_down_data
 
 def get_service_charge(amount):
-  service_charge = amount * .18
+  service_charge = amount * .14
   return int(service_charge)
 
 def get_discord_client():

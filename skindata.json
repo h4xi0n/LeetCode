@@ -12,6 +12,7 @@
 {"Wasteland":"4270"},
 {"Winterwunderland":"5100"},
 {"NuncaOlvidados":"5100"},
+{"Snowfall":"5100"},
 {"Prism":"5945"},
 {"Prism1":"5945"},
 {"PrismI":"5945"},
@@ -50,9 +51,11 @@
 {"MagepunkII":"7100"},
 {"Magepunk2":"7100"},
 {"Champions":"6263"},
-{"Snowfall":"5100"},
-{"Protocol":"9900"}
-
+{"Protocol":"9900"},
+{"Tigris":"5100"},
+{"Undercity":"7100"},
+{"GaiasVengeance":"7100"},
+{"Gaias":"7100"}  
 ],
 
 "Skins":[
@@ -70,6 +73,7 @@
 {"Sakura":"1275"},
 {"NuncaOlvidados":"1275"},
 {"Nunca":"1275"},
+{"Snowfall":"1275"},
 {"Prime":"1775"},
 {"Sovereign":"1775"},
 {"Elderflame":"2475"},
@@ -112,7 +116,11 @@
 {"Spectrum":"2675"},
 {"RadiantCrisis":"1775"},
 {"Radiant":"1775"},
-{"Snowfall":"1275"}
+{"Protocol":"2475"},
+{"Tigris":"1275"},
+{"Undercity":"1775"},
+{"GaiasVengeance":"1775"},
+{"Gaias":"1775"} 
 ],
 
  "Melee":[
@@ -124,6 +132,7 @@
       {"Prism":"2550"},
       {"Winterwunderland":"2550"},
       {"NuncaOlvidados":"2550"},
+      {"Snowfall":"2550"},
       {"Celestial":"3550"},
       {"Ego":"3550"},
       {"Forsaken":"3550"},
@@ -160,7 +169,16 @@
       {"RadiantCrisis":"3550"},
       {"Radiant":"3550"},
       {"Baseball":"3550"},
-      {"Catrina":"2550"}
+      {"Catrina":"2550"},
+      {"Wand":"2550"},
+      {"HuElse":"2550"},
+      {"Tigris":"2550"},
+      {"Protocol":"4950"},
+      {"Undercity":"3550"},
+      {"Hack":"3550"},
+      {"GaiasWrath":"3550"},
+      {"GaiasVengeance":"3550"},
+      {"Gaias":"3550"}
    ],
    "Default":[
      "Classic",
